@@ -39,6 +39,7 @@ your tailwind.config.js.
   - [variantChar: `[string]`](#variantchar-string)
   - [separatorChar: `[string]`](#separatorchar-string)
   - [expandOpenChar: `[string]` and expandCloseChar: `[string]`](#expandopenchar-string-and-expandclosechar-string)
+  - [compressWhitespaces: `[boolean]`](#compresswhitespaces-boolean)
 - [Issues](#issues)
   - [🐛 Bugs](#-bugs)
   - [💡 Feature Requests](#-feature-requests)
@@ -238,6 +239,51 @@ will be transformed to:
 export default function Hero({children}) {
   return (
     <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-2 xl:pb-32">
+      {children}
+    </div>
+  )
+}
+```
+
+### compressWhitespaces: `[boolean]`
+
+- compressWhitespaces: _Default: `false`_
+
+This allows users to allow compressing the whitespaces in their files. This is
+added as a paramter so it doesn't break any existing user setups.
+
+Change the call to `createTransformer` in your `tailwind.config.js`.
+
+```javascript
+// tailwind.config.js
+const createTransformer = require('tailwind-group-variant')
+module.exports = {
+  content: {
+    files: ['./app/**/*.{ts,tsx,jsx,js,mdx}'],
+    transform: createTransformer({ compressWhitespaces: true }),
+  },
+  ...
+}
+```
+
+The whitespaces in your components:
+
+```tsx
+export default function Hero({children}) {
+  return (
+    <div className="  relative       z-10 pb-8   sm:pb-16 md:pb-20   lg:(    max-w-2xl,w-full   ) xl:pb-32  ">
+      {children}
+    </div>
+  )
+}
+```
+
+will be transformed to:
+
+```tsx
+export default function Hero({children}) {
+  return (
+    <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full xl:pb-32">
       {children}
     </div>
   )
