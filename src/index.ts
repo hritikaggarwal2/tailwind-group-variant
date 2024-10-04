@@ -159,6 +159,8 @@ const transformMachine: TransformMachine = {
     if (char === machineState.settings.variantChar) {
       machineState.context.variantEndIdx = idx
       machineState.state = State.variant
+    } else if (char === machineState.settings.separatorChar) {
+      machineState.context.variantStartIdx = idx + 1
     } else if (machineState.settings.badChars.includes(char)) {
       machineState.state = State.init
     }
@@ -235,6 +237,10 @@ function transform(content: string, options?: TransformOptions) {
     content = compressWhitespaces(content)
   }
 
+  let localBadChars = [...badChars, ...whitespaceChars].filter(
+    char => char !== options?.separatorChar,
+  )
+
   const machineState: TransformMachineState = {
     context: {
       matches: [],
@@ -245,7 +251,7 @@ function transform(content: string, options?: TransformOptions) {
     },
     state: State.init,
     settings: {
-      badChars: [...badChars, ...whitespaceChars],
+      badChars: localBadChars,
       expandClose: options?.expandCloseChar ?? ')',
       expandOpen: options?.expandOpenChar ?? '(',
       separatorChar: options?.separatorChar ?? ',',
