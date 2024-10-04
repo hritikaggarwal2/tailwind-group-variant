@@ -76,6 +76,44 @@ describe.each(Object.entries(tests))(
   },
 )
 
+const testsWithoutWhitespace: Record<string, TestCase> = {
+  'bad char after variant': {
+    input: `test dark: (p-2,m-3 lg:(p-3,m-4) )`,
+    output: `test dark: (p-2,m-3 lg:p-3 lg:m-4)`,
+  },
+  'bad char after stack opens': {
+    input: `test dark:( p-2, lg:(p-3,m-4) )`,
+    output: `test dark:(p-2, lg:p-3 lg:m-4)`,
+  },
+  'extra spacing inside variants': {
+    input: `test dark:(   p-2,m-3 ) a`,
+    output: `test dark:p-2 dark:m-3 a`,
+  },
+  'extra spacing outside variants': {
+    input: `  test   dark:(p-2,m-3)  `,
+    output: `test dark:p-2 dark:m-3`,
+  },
+}
+
+describe.each(Object.entries(testsWithoutWhitespace))(
+  'group variants without whitespace',
+  (title, {input, output, only = false, skip = false, options}) => {
+    options = options ?? {}
+    options.compressWhitespaces = true
+
+    const testFn = () =>
+      expect(createTransformer(options)(input)).toEqual(output)
+
+    if (only) {
+      test.only(title, testFn)
+    } else if (skip) {
+      test.skip(title, testFn)
+    } else {
+      test(title, testFn)
+    }
+  },
+)
+
 /*
 eslint
   jest/valid-title: "off",

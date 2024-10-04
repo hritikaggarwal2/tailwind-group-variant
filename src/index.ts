@@ -54,6 +54,7 @@ type TransformOptions = {
   expandCloseChar?: string
   separatorChar?: string
   variantChar?: string
+  compressWhitespaces?: boolean
 }
 
 function stackClose(
@@ -221,7 +222,19 @@ const transformMachine: TransformMachine = {
   },
 }
 
+function compressWhitespaces(content: string) {
+  return content
+    .replace(/\s+/g, ' ')
+    .replace(/\(\s+/g, '(')
+    .replace(/\s+\)/g, ')')
+    .trim()
+}
+
 function transform(content: string, options?: TransformOptions) {
+  if (options?.compressWhitespaces) {
+    content = compressWhitespaces(content)
+  }
+
   const machineState: TransformMachineState = {
     context: {
       matches: [],
